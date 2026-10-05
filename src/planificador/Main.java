@@ -48,7 +48,10 @@ public class Main {
                 + " | quantum: " + quantum + " | traza: " + traza);
 
         // TAREA 1: leer los procesos del fichero
+
         try {
+
+            // TAREA 1: leer los procesos del fichero
             List<Proceso> procesos = LectorProcesos.leer(fichero);
 
             System.out.println("Procesos cargados:");
@@ -64,7 +67,68 @@ public class Main {
                 );
             }
 
+            // TAREA 2
+            Simulador simulador = new Simulador();
+
+            if (algoritmo.equals("fcfs")) {
+
+                List<String> gantt = simulador.ejecutar(
+                        procesos,
+                        new FCFS()
+                );
+
+                System.out.println("\n=== FCFS ===");
+                System.out.println(gantt);
+
+            } else if (algoritmo.equals("sjf")) {
+
+                List<String> gantt = simulador.ejecutar(
+                        procesos,
+                        new SJF()
+                );
+
+                System.out.println("\n=== SJF ===");
+                System.out.println(gantt);
+
+            } else if (algoritmo.equals("rr")) {
+
+                List<String> gantt = simulador.ejecutar(
+                        procesos,
+                        new RoundRobin(quantum)
+                );
+
+                System.out.println("\n=== Round Robin (q=" + quantum + ") ===");
+                System.out.println(gantt);
+
+            } else if (algoritmo.equals("todos")) {
+
+                List<String> ganttFCFS = simulador.ejecutar(
+                        procesos,
+                        new FCFS()
+                );
+
+                List<String> ganttSJF = simulador.ejecutar(
+                        procesos,
+                        new SJF()
+                );
+
+                List<String> ganttRR = simulador.ejecutar(
+                        procesos,
+                        new RoundRobin(quantum)
+                );
+
+                System.out.println("\n=== FCFS ===");
+                System.out.println(ganttFCFS);
+
+                System.out.println("\n=== SJF ===");
+                System.out.println(ganttSJF);
+
+                System.out.println("\n=== Round Robin (q=" + quantum + ") ===");
+                System.out.println(ganttRR);
+            }
+
         } catch (Exception e) {
+
             System.err.println("Error al leer los procesos: " + e.getMessage());
             System.exit(1);
         }
