@@ -47,8 +47,26 @@ public class Main {
         System.out.println("Fichero: " + fichero + " | algoritmo: " + algoritmo
                 + " | quantum: " + quantum + " | traza: " + traza);
 
-        // TODO (tareas 1 a 3): a partir de aquí, lee los procesos del fichero,
-        // simula el algoritmo o algoritmos pedidos y muestra los resultados.
-        // Cuando lo tengas, borra el println de arriba y este comentario.
+        // TAREA 1: leer los procesos del fichero
+        try {
+            List<Proceso> procesos = LectorProcesos.leer(fichero);
+
+            System.out.println("Procesos cargados:");
+            System.out.println("-----------------");
+
+            for (Proceso proceso : procesos) {
+                System.out.println(
+                        proceso.getNombre()
+                                + " | llegada=" + proceso.getLlegada()
+                                + " | ráfaga=" + proceso.getRafaga()
+                                + " | restante=" + proceso.getRestante()
+                                + " | estado=" + proceso.getEstado()
+                );
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error al leer los procesos: " + e.getMessage());
+            System.exit(1);
+        }
     }
 }
