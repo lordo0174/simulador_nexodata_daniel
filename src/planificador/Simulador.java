@@ -5,8 +5,9 @@ import java.util.List;
 
 public class Simulador {
 
-    public Resultado ejecutar(List<Proceso> procesosOriginales,
-                              Algoritmo algoritmo) {
+        public Resultado ejecutar(List<Proceso> procesosOriginales,
+                              Algoritmo algoritmo,
+                              boolean traza) {
 
         List<Proceso> procesos = new ArrayList<>();
 
@@ -99,6 +100,14 @@ public class Simulador {
 
                 gantt.add(ejecutando.getNombre());
 
+                if (traza) {
+                    System.out.println(
+                            "t=" + tiempo
+                                    + " | ejecuta="
+                                    + ejecutando.getNombre()
+                    );
+                }
+
                 ejecutando.setRestante(
                         ejecutando.getRestante() - 1
                 );
@@ -110,6 +119,14 @@ public class Simulador {
             } else {
 
                 gantt.add("-");
+
+                if (traza) {
+                    System.out.println(
+                            "t=" + tiempo
+                                    + " | ejecuta=IDLE"
+                    );
+                }
+
                 procesoAnterior = null;
             }
 

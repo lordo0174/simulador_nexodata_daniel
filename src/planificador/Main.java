@@ -77,7 +77,8 @@ public class Main {
 
                 Resultado resultado = simulador.ejecutar(
                         procesos,
-                        new FCFS()
+                        new FCFS(),
+                        traza
                 );
 
                 mostrarResultado("FCFS", resultado);
@@ -87,7 +88,8 @@ public class Main {
 
                 Resultado resultado = simulador.ejecutar(
                         procesos,
-                        new SJF()
+                        new SJF(),
+                        traza
                 );
 
                 mostrarResultado("SJF", resultado);
@@ -97,7 +99,8 @@ public class Main {
 
                 Resultado resultado = simulador.ejecutar(
                         procesos,
-                        new RoundRobin(quantum)
+                        new RoundRobin(quantum),
+                        traza
                 );
 
                 mostrarResultado(
@@ -110,17 +113,20 @@ public class Main {
 
                 Resultado resultadoFCFS = simulador.ejecutar(
                         procesos,
-                        new FCFS()
+                        new FCFS(),
+                        traza
                 );
 
                 Resultado resultadoSJF = simulador.ejecutar(
                         procesos,
-                        new SJF()
+                        new SJF(),
+                        traza
                 );
 
                 Resultado resultadoRR = simulador.ejecutar(
                         procesos,
-                        new RoundRobin(quantum)
+                        new RoundRobin(quantum),
+                        traza
                 );
 
                 mostrarResultado("FCFS", resultadoFCFS);
