@@ -5,8 +5,8 @@ import java.util.List;
 
 public class Simulador {
 
-    public List<String> ejecutar(List<Proceso> procesosOriginales,
-                                 Algoritmo algoritmo) {
+    public Resultado ejecutar(List<Proceso> procesosOriginales,
+                              Algoritmo algoritmo) {
 
         List<Proceso> procesos = new ArrayList<>();
 
@@ -22,9 +22,12 @@ public class Simulador {
         int tiempo = 0;
         int quantumRestante = algoritmo.getQuantum();
 
+        String procesoAnterior = null;
+        int cambiosContexto = 0;
+
         while (!todosTerminados(procesos)) {
 
-            // 1. Llegan los procesos en este instante
+            // 1. Llegan los procesos
             for (Proceso proceso : procesos) {
 
                 if (proceso.getLlegada() == tiempo
@@ -35,10 +38,11 @@ public class Simulador {
                 }
             }
 
-            // 2. Comprobar si termina el proceso actual
+            // 2. Si el proceso ha terminado, registrar sus métricas
             if (ejecutando != null && ejecutando.estaTerminado()) {
 
-                ejecutando.setEstado(EstadoProceso.TERMINADO);
+                ejecutarFin(ejecutando, tiempo);
+
                 ejecutando = null;
                 quantumRestante = algoritmo.getQuantum();
             }
@@ -52,24 +56,40 @@ public class Simulador {
 
                     ejecutando.setEstado(EstadoProceso.LISTO);
                     listos.add(ejecutando);
+
                     ejecutando = null;
                     quantumRestante = algoritmo.getQuantum();
 
                 } else {
 
-                    // No hay nadie esperando.
-                    // El mismo proceso continúa.
                     quantumRestante = algoritmo.getQuantum();
                 }
             }
 
-            // 4. Si la CPU está libre, elegir proceso
+            // 4. Elegir un proceso si la CPU está libre
             if (ejecutando == null && !listos.isEmpty()) {
 
                 ejecutando = algoritmo.seleccionar(listos);
                 listos.remove(ejecutando);
 
                 ejecutando.setEstado(EstadoProceso.EJECUCION);
+
+                // Primera entrada en CPU
+                if (ejecutando.getRespuesta() == -1) {
+
+                    ejecutando.setRespuesta(
+                            tiempo - ejecutando.getLlegada()
+                    );
+                }
+
+                // Cambio de contexto
+                if (procesoAnterior != null
+                        && !procesoAnterior.equals(ejecutando.getNombre())) {
+
+                    cambiosContexto++;
+                }
+
+                procesoAnterior = ejecutando.getNombre();
 
                 quantumRestante = algoritmo.getQuantum();
             }
@@ -89,14 +109,38 @@ public class Simulador {
 
             } else {
 
-                // CPU sin trabajo
                 gantt.add("-");
+                procesoAnterior = null;
             }
 
             tiempo++;
         }
 
-        return gantt;
+        // Registrar el último proceso que haya terminado
+        if (ejecutando != null && ejecutando.estaTerminado()) {
+            ejecutarFin(ejecutando, tiempo);
+        }
+
+        return new Resultado(
+                procesos,
+                gantt,
+                cambiosContexto
+        );
+    }
+
+    private void ejecutarFin(Proceso proceso, int tiempo) {
+
+        proceso.setEstado(EstadoProceso.TERMINADO);
+
+        proceso.setFin(tiempo);
+
+        proceso.setRetorno(
+                tiempo - proceso.getLlegada()
+        );
+
+        proceso.setEspera(
+                proceso.getRetorno() - proceso.getRafaga()
+        );
     }
 
     private boolean todosTerminados(List<Proceso> procesos) {

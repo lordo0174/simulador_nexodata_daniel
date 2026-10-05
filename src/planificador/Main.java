@@ -47,11 +47,13 @@ public class Main {
         System.out.println("Fichero: " + fichero + " | algoritmo: " + algoritmo
                 + " | quantum: " + quantum + " | traza: " + traza);
 
-        // TAREA 1: leer los procesos del fichero
+        // TODO (tareas 1 a 3): a partir de aquí, lee los procesos del fichero,
+        // simula el algoritmo o algoritmos pedidos y muestra los resultados.
+        // Cuando lo tengas, borra el println de arriba y este comentario.
 
         try {
 
-            // TAREA 1: leer los procesos del fichero
+            // Leer procesos del fichero
             List<Proceso> procesos = LectorProcesos.leer(fichero);
 
             System.out.println("Procesos cargados:");
@@ -67,70 +69,154 @@ public class Main {
                 );
             }
 
-            // TAREA 2
+            // Crear simulador
             Simulador simulador = new Simulador();
 
+            // FCFS
             if (algoritmo.equals("fcfs")) {
 
-                List<String> gantt = simulador.ejecutar(
+                Resultado resultado = simulador.ejecutar(
                         procesos,
                         new FCFS()
                 );
 
-                System.out.println("\n=== FCFS ===");
-                System.out.println(gantt);
+                mostrarResultado("FCFS", resultado);
 
+                // SJF
             } else if (algoritmo.equals("sjf")) {
 
-                List<String> gantt = simulador.ejecutar(
+                Resultado resultado = simulador.ejecutar(
                         procesos,
                         new SJF()
                 );
 
-                System.out.println("\n=== SJF ===");
-                System.out.println(gantt);
+                mostrarResultado("SJF", resultado);
 
+                // Round Robin
             } else if (algoritmo.equals("rr")) {
 
-                List<String> gantt = simulador.ejecutar(
+                Resultado resultado = simulador.ejecutar(
                         procesos,
                         new RoundRobin(quantum)
                 );
 
-                System.out.println("\n=== Round Robin (q=" + quantum + ") ===");
-                System.out.println(gantt);
+                mostrarResultado(
+                        "Round Robin (q=" + quantum + ")",
+                        resultado
+                );
 
+                // Todos
             } else if (algoritmo.equals("todos")) {
 
-                List<String> ganttFCFS = simulador.ejecutar(
+                Resultado resultadoFCFS = simulador.ejecutar(
                         procesos,
                         new FCFS()
                 );
 
-                List<String> ganttSJF = simulador.ejecutar(
+                Resultado resultadoSJF = simulador.ejecutar(
                         procesos,
                         new SJF()
                 );
 
-                List<String> ganttRR = simulador.ejecutar(
+                Resultado resultadoRR = simulador.ejecutar(
                         procesos,
                         new RoundRobin(quantum)
                 );
 
-                System.out.println("\n=== FCFS ===");
-                System.out.println(ganttFCFS);
+                mostrarResultado("FCFS", resultadoFCFS);
 
-                System.out.println("\n=== SJF ===");
-                System.out.println(ganttSJF);
+                mostrarResultado("SJF", resultadoSJF);
 
-                System.out.println("\n=== Round Robin (q=" + quantum + ") ===");
-                System.out.println(ganttRR);
+                mostrarResultado(
+                        "Round Robin (q=" + quantum + ")",
+                        resultadoRR
+                );
             }
 
         } catch (Exception e) {
 
-            System.err.println("Error al leer los procesos: " + e.getMessage());
+            System.err.println(
+                    "Error al ejecutar el simulador: "
+                            + e.getMessage()
+            );
+
             System.exit(1);
         }
+    }
+
+    private static void mostrarResultado(
+            String nombreAlgoritmo,
+            Resultado resultado) {
+
+        System.out.println();
+        System.out.println("=== " + nombreAlgoritmo + " ===");
+
+        System.out.println("Gantt:");
+        System.out.println(resultado.getGantt());
+
+        System.out.println(
+                "Cambios de contexto: "
+                        + resultado.getCambiosContexto()
+        );
+
+        System.out.println();
+
+        System.out.println(
+                "Proceso | Fin | Retorno | Espera | Respuesta"
+        );
+
+        System.out.println(
+                "---------------------------------------------"
+        );
+
+        for (Proceso proceso : resultado.getProcesos()) {
+
+            System.out.println(
+                    proceso.getNombre()
+                            + "       | "
+                            + proceso.getFin()
+                            + "   | "
+                            + proceso.getRetorno()
+                            + "       | "
+                            + proceso.getEspera()
+                            + "      | "
+                            + proceso.getRespuesta()
+            );
+        }
+
+        double mediaRetorno = 0;
+        double mediaEspera = 0;
+        double mediaRespuesta = 0;
+
+        for (Proceso proceso : resultado.getProcesos()) {
+
+            mediaRetorno += proceso.getRetorno();
+            mediaEspera += proceso.getEspera();
+            mediaRespuesta += proceso.getRespuesta();
+        }
+
+        int cantidad = resultado.getProcesos().size();
+
+        if (cantidad > 0) {
+
+            mediaRetorno = mediaRetorno / cantidad;
+            mediaEspera = mediaEspera / cantidad;
+            mediaRespuesta = mediaRespuesta / cantidad;
+        }
+
+        System.out.printf(
+                "Media retorno: %.2f%n",
+                mediaRetorno
+        );
+
+        System.out.printf(
+                "Media espera: %.2f%n",
+                mediaEspera
+        );
+
+        System.out.printf(
+                "Media respuesta: %.2f%n",
+                mediaRespuesta
+        );
     }
 }
